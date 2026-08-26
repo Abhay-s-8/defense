@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 ## Mastercard-inspired frontend refresh
@@ -13,3 +14,6 @@ The landing page now includes:
 
 The three user-supplied reference screenshots are stored in:
 `frontend/public/assets/`
+=======
+# AI-DEFENSE-LAB
+>>>>>>> 4d0392bbcf2177ed3b2069f5190b990444de58a5
