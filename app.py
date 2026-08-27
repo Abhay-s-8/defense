@@ -30,8 +30,34 @@ JWT_SECRET = os.environ.get(
 TOKEN_LIFETIME_SECONDS = 8 * 60 * 60
 
 app = Flask(__name__)
-CORS(app)
+CORS(
+    app,
+    resources={r"/*": {"origins": [
+        "https://ai-defense-lab.vercel.app",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ]}},
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "OPTIONS"]
+)
+@app.after_request
+def add_cors_headers(response):
+    origin = request.headers.get("Origin")
 
+    if origin and (
+        origin == "https://ai-defense-lab.vercel.app"
+        or origin.endswith(".vercel.app")
+        or origin in ["http://localhost:5173", "http://127.0.0.1:5173"]
+    ):
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type, Authorization"
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST, OPTIONS"
+        )
+
+    return response
 
 def get_db():
     connection = sqlite3.connect(DATABASE_PATH)
