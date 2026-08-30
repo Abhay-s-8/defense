@@ -36,7 +36,13 @@ JWT_SECRET = os.environ.get(
 TOKEN_LIFETIME_SECONDS = 8 * 60 * 60
 
 MONGODB_URI = os.environ.get("MONGODB_URI")
+client = MongoClient(MONGODB_URI)
 
+db = client["Aidefense"]
+
+users_collection = db["users"]
+runs_collection = db["red_team_runs"]
+missed_collection = db["missed_attacks"]
 if not MONGODB_URI:
     raise RuntimeError(
         "MONGODB_URI environment variable is not configured."
