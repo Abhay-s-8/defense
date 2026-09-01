@@ -250,34 +250,60 @@ def _signal_summary(transaction: Dict[str, Any]) -> List[str]:
 
 
 def explain_prediction(transaction: Dict[str, Any], model_result: Dict[str, Any]) -> Dict[str, Any]:
+    math_contribs = model_result.get("mathematical_contributions", {})
+    pos_drivers = math_contribs.get("top_positive", [])
+    neg_drivers = math_contribs.get("top_negative", [])
+
+    # Format human-readable exact mathematical signals
+    math_signals = []
+    for d in pos_drivers:
+        f_name = d["feature"].replace("_", " ").title()
+        math_signals.append(f"[+] {f_name} (+{d['weight']} risk driver)")
+    for d in neg_drivers:
+        f_name = d["feature"].replace("_", " ").title()
+        math_signals.append(f"[-] {f_name} ({d['weight']} safety anchor)")
+
     if LLM_BASE_URL and LLM_MODEL:
         system_prompt = """
-You are a payment-fraud analyst. Explain a model prediction using only the supplied behavioral features and model output.
-Do not claim causality or reveal hidden model internals. Return JSON only with summary, key_signals (array), and recommended_action.
-Keep it concise and defensive.
+You are a payment-fraud compliance analyst. Explain a model prediction using the supplied behavioral features, exact TreeSHAP feature contributions, and model output.
+Ground your explanation strictly on the mathematical feature contribution weights. Return JSON only with summary, key_signals (array), and recommended_action.
+Keep it concise and defensively grounded.
 """.strip()
         try:
-            raw = _call_remote_llm(system_prompt, json.dumps({"transaction": transaction, "model_result": model_result}))
+            raw = _call_remote_llm(system_prompt, json.dumps({
+                "transaction": transaction,
+                "model_result": model_result,
+                "mathematical_feature_weights": math_contribs,
+            }))
             return {
                 "summary": str(raw.get("summary", ""))[:700],
-                "key_signals": [str(x)[:180] for x in raw.get("key_signals", [])[:6]],
+                "key_signals": [str(x)[:180] for x in raw.get("key_signals", [])[:6]] or (math_signals or _signal_summary(transaction)),
                 "recommended_action": str(raw.get("recommended_action", ""))[:400],
                 "source": "remote_llm",
+                "mathematically_grounded": True,
             }
         except Exception:
             pass
 
-    signals = _signal_summary(transaction)
+    signals = math_signals if math_signals else _signal_summary(transaction)
     probability = float(model_result.get("fraud_probability", 0) or 0)
     prediction = model_result.get("prediction", "UNKNOWN")
+    
     if prediction == "FRAUD":
-        action = "Review or step-up authenticate the transaction before approval."
-        summary = f"The model marked this transaction as {prediction} with {probability:.2f}% fraud probability because several behavioral signals are unusual together."
+        action = "Step-up challenge (OTP/Biometric) or route to manual fraud review."
+        top_reason = pos_drivers[0]["feature"].replace("_", " ") if pos_drivers else "abnormal behavioral velocity"
+        summary = f"Flagged as {prediction} ({probability:.2f}% probability) mathematically driven by {top_reason} and correlated behavioral anomalies."
     else:
-        action = "Allow normal processing while keeping standard monitoring active."
-        summary = f"The model marked this transaction as {prediction} with {probability:.2f}% fraud probability because most observed behavior is consistent with normal activity."
+        action = "Approve for frictionless payment processing under active monitoring."
+        summary = f"Classified as {prediction} ({probability:.2f}% probability) with behavioral features well within normal account variance."
 
-    return {"summary": summary, "key_signals": signals, "recommended_action": action, "source": "local_fallback"}
+    return {
+        "summary": summary,
+        "key_signals": signals,
+        "recommended_action": action,
+        "source": "local_fallback",
+        "mathematically_grounded": bool(pos_drivers or neg_drivers),
+    }
 
 
 def analyze_red_team_run(summary: Dict[str, Any], missed_samples: List[Dict[str, Any]]) -> Dict[str, Any]:

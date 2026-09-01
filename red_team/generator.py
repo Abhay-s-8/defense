@@ -367,6 +367,30 @@ def generate_low_and_slow():
     }
 
 
+def _inject_adversarial_noise(attack):
+    """
+    Injects non-linear adversarial perturbations to simulate zero-day evasion
+    tactics (e.g. residential proxy jitter, fingerprint rotation, stealth timing).
+    """
+    # 1. Stochastic Gaussian jitter on amount deviation (avoids rigid cluster spikes)
+    jitter = float(np.random.normal(0, 0.04))
+    attack["amount_deviation"] = max(0.01, round(float(attack.get("amount_deviation", 1.0)) * (1.0 + jitter), 3))
+    avg_amt = max(float(attack.get("avg_amount_30d", 1000)), 1.0)
+    attack["amount"] = round(avg_amt * attack["amount_deviation"], 2)
+
+    # 2. Residential proxy spoofing simulation: 15% of stealth attacks mask IP risk into normal range (15-35)
+    if random.random() < 0.15 and attack.get("fraud_type") in ["low_and_slow", "account_takeover"]:
+        attack["ip_risk_score"] = round(float(np.random.uniform(15, 38)), 2)
+        attack["adversarial_evasion"] = "residential_proxy_stealth"
+
+    # 3. Behavioral hour camouflage: align hour with user's typical daytime activity
+    if random.random() < 0.25 and attack.get("fraud_type") == "low_and_slow":
+        attack["hour_of_day"] = random.randint(10, 18)
+        attack["is_weekend"] = 0
+
+    return attack
+
+
 def _sample_probability(probability):
     probability = max(0.0, min(1.0, float(probability)))
     return 1 if random.random() < probability else 0
@@ -374,11 +398,11 @@ def _sample_probability(probability):
 
 def _apply_plan(attack, plan):
     if not plan or not isinstance(plan, dict):
-        return attack
+        return _inject_adversarial_noise(attack)
 
     params = plan.get("parameters", {})
     if not isinstance(params, dict):
-        return attack
+        return _inject_adversarial_noise(attack)
 
     avg_amount = max(float(attack.get("avg_amount_30d", 1) or 1), 1.0)
 
@@ -423,7 +447,89 @@ def _apply_plan(attack, plan):
 
     attack["ai_strategy_title"] = str(plan.get("title", ""))[:120]
     attack["ai_strategy_source"] = str(plan.get("source", "manual"))[:40]
-    return attack
+    return _inject_adversarial_noise(attack)
+
+
+def generate_social_engineering_coercion():
+    """
+    Simulates an Authorized Push Payment (APP) / Digital Arrest scam:
+    Transaction metadata appears genuine (0 failed attempts, true device),
+    but interaction telemetry exhibits severe coercion flags.
+    """
+    avg_amount = np.random.uniform(2000, 15000)
+    amount = avg_amount * np.random.uniform(1.8, 4.5)
+
+    return {
+        "transaction_id": "RED_COERCE_" + str(random.randint(100000, 999999)),
+        "user_id": "VICTIM_" + str(random.randint(1000, 9999)),
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "amount": round(amount, 2),
+        "payment_channel": random.choice(["UPI", "BANK_TRANSFER", "NEFT"]),
+        "merchant_category": "OTHER",
+        "country": "IN",
+        "account_age_days": random.randint(400, 2000),
+        "device_age_days": random.randint(200, 900),
+        "new_device": 0,
+        "new_location": 0,
+        "new_beneficiary": 1,
+        "transaction_velocity_5m": 1,
+        "failed_attempts_1h": 0,
+        "avg_amount_30d": round(avg_amount, 2),
+        "amount_deviation": round(amount / avg_amount, 3),
+        "ip_risk_score": round(np.random.uniform(5, 20), 2),
+        "beneficiary_age_days": 0,
+        "hour_of_day": random.randint(9, 21),
+        "is_weekend": 0,
+        "fraud_type": "social_engineering_coercion",
+        "attack_difficulty": 0.98,
+        "is_synthetic": 1,
+        "is_fraud": 1,
+        "interaction_telemetry": {
+            "on_call_detected": True,
+            "submit_hesitation_ms": random.randint(4500, 9000),
+            "backspace_count": random.randint(6, 14),
+            "keystroke_dwell_times": [random.uniform(140, 260) for _ in range(8)],
+            "keystroke_flight_times": [random.uniform(250, 600) for _ in range(8)],
+            "form_dwell_time_ms": random.randint(25000, 60000),
+        },
+    }
+
+
+def generate_mule_syndicate():
+    """
+    Simulates a coordinated multi-hop mule ring with cyclic fund routing.
+    """
+    avg_amount = np.random.uniform(5000, 25000)
+    amount = avg_amount * np.random.uniform(1.2, 2.5)
+    cluster_idx = random.randint(1, 10)
+
+    return {
+        "transaction_id": "RED_GNN_" + str(random.randint(100000, 999999)),
+        "user_id": f"MULE_NODE_{cluster_idx}_{random.randint(1, 4)}",
+        "beneficiary_id": f"MULE_NODE_{cluster_idx}_{random.randint(1, 4)}",
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "amount": round(amount, 2),
+        "payment_channel": "UPI",
+        "merchant_category": "OTHER",
+        "country": "IN",
+        "account_age_days": random.randint(30, 200),
+        "device_age_days": random.randint(10, 60),
+        "new_device": 1,
+        "new_location": 0,
+        "new_beneficiary": 1,
+        "transaction_velocity_5m": random.randint(3, 8),
+        "failed_attempts_1h": 0,
+        "avg_amount_30d": round(avg_amount, 2),
+        "amount_deviation": round(amount / avg_amount, 3),
+        "ip_risk_score": round(np.random.uniform(40, 75), 2),
+        "beneficiary_age_days": random.randint(0, 5),
+        "hour_of_day": random.randint(0, 23),
+        "is_weekend": random.choice([0, 1]),
+        "fraud_type": "mule_syndicate",
+        "attack_difficulty": 0.90,
+        "is_synthetic": 1,
+        "is_fraud": 1,
+    }
 
 
 def generate_attack(attack_type, plan=None):
@@ -435,6 +541,10 @@ def generate_attack(attack_type, plan=None):
         attack = generate_mule_activity()
     elif attack_type == "low_and_slow":
         attack = generate_low_and_slow()
+    elif attack_type == "social_engineering_coercion":
+        attack = generate_social_engineering_coercion()
+    elif attack_type == "mule_syndicate":
+        attack = generate_mule_syndicate()
     else:
         raise ValueError("Unsupported attack type: " + str(attack_type))
 
@@ -443,3 +553,5 @@ def generate_attack(attack_type, plan=None):
 
 def generate_multiple_attacks(attack_type, count, plan=None):
     return [generate_attack(attack_type, plan=plan) for _ in range(count)]
+
+

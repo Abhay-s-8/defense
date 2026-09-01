@@ -86,6 +86,17 @@ export default function RedTeam() {
 
               {analysis && <div className="ai-insight-card left-align"><div className="ai-card-label">GENAI WEAKNESS ANALYST · {analysis.source === "remote_llm" ? "REMOTE LLM" : "LOCAL FALLBACK"}</div><p>{analysis.finding}</p><ul>{analysis.likely_weaknesses?.map((x) => <li key={x}>{x}</li>)}</ul><div className="ai-action"><strong>Next test:</strong> {analysis.next_test}</div><div className="ai-action"><strong>Retraining note:</strong> {analysis.retraining_note}</div></div>}
 
+              {result.missed > 0 && (
+                <div style={{ marginTop: "14px", padding: "12px", background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "8px" }}>
+                  <div style={{ fontSize: "13px", color: "#f87171", marginBottom: "8px" }}>
+                    ⚠️ <strong>{result.missed} missed attacks</strong> stored for adversarial learning.
+                  </div>
+                  <a href="/metrics" className="primary-button" style={{ display: "inline-block", textAlign: "center", width: "100%", padding: "8px 12px", fontSize: "13px", textDecoration: "none" }}>
+                    Fortify Model in Retraining Loop →
+                  </a>
+                </div>
+              )}
+
               <h3 className="attack-results-title">Individual Attack Probabilities</h3>
               <div className="attack-results-list">{result.results?.map((item, index) => <div className="attack-result-row" key={item.transaction_id}><div><strong>#{index + 1} · ₹{Number(item.amount).toLocaleString()}</strong><small>{item.transaction_id}</small></div><div className="attack-result-score"><strong>{item.probability}%</strong><span className={item.prediction === "FRAUD" ? "fraud-text" : "legit-text"}>{item.prediction}</span></div></div>)}</div>
             </div>
