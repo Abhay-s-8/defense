@@ -149,9 +149,9 @@ add_card(slide1, Inches(8.8), Inches(4.3), Inches(3.6), Inches(2.2), "3. Trace t
 
 footer_box = slide1.shapes.add_textbox(Inches(0.8), Inches(6.8), Inches(11.5), Inches(0.4))
 p_foot = footer_box.text_frame.paragraphs[0]
-p_foot.text = "Team: AITIANS  |  Army Institute of Technology, Pune"
+p_foot.text = "Team: IRON  |  Live Prototype: https://defense-six.vercel.app/  |  GitHub: https://github.com/Abhay-s-8/defense"
 p_foot.font.size = Pt(12)
-p_foot.font.color.rgb = MUTED_TEXT
+p_foot.font.color.rgb = GOLD_ACCENT
 
 # ============================================================
 # SLIDE 2: THE REAL HUMAN TRAGEDY (DIGITAL ARREST SCAMS)
@@ -537,15 +537,16 @@ add_card(slide12, Inches(0.8), Inches(1.8), Inches(5.6), Inches(4.8), "Key Break
     "   • Exact TreeSHAP mathematical feature weighting."
 ], GREEN_ACCENT)
 
-add_card(slide12, Inches(6.8), Inches(1.8), Inches(5.6), Inches(4.8), "Team AITIANS — Final Takeaway", [
+add_card(slide12, Inches(6.8), Inches(1.8), Inches(5.6), Inches(4.8), "Team IRON — Final Takeaway", [
     "\"Fraud is not one-dimensional, and defense cannot be static.\"",
     "",
     "By uniting interaction biometrics, high-speed transaction ML, and graph intelligence into one continuous learning loop, we establish a robust, self-healing payment defense perimeter.",
     "",
     "Attack. Detect. Learn. Defend.",
     "",
-    "Team: AITIANS (Army Institute of Technology, Pune)",
-    "GitHub: github.com/Abhay-s-8/defense"
+    "★ Team: IRON",
+    "★ Live Prototype: https://defense-six.vercel.app/",
+    "★ GitHub Repo: https://github.com/Abhay-s-8/defense"
 ], GOLD_ACCENT)
 
 output_path = "d:/ecg/AI_Defense_Lab_Presentation.pptx"

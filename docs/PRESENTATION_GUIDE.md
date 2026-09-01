@@ -1,5 +1,7 @@
 # AI DEFENSE LAB — Humanized Presentation & Spoken Story Guide
-**Team IRON | Army Institute of Technology, Pune**  
+**Team IRON | AI Defense Lab**  
+**Live Prototype**: [https://defense-six.vercel.app/](https://defense-six.vercel.app/)  
+**GitHub Repository**: [https://github.com/Abhay-s-8/defense](https://github.com/Abhay-s-8/defense)  
 **PowerPoint File**: [`AI_Defense_Lab_Presentation.pptx`](file:///d:/ecg/AI_Defense_Lab_Presentation.pptx)
 
 ---
