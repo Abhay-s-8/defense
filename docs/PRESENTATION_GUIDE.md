@@ -1,5 +1,5 @@
 # AI DEFENSE LAB — Humanized Presentation & Spoken Story Guide
-**Team AITIANS | Army Institute of Technology, Pune**  
+**Team IRON | Army Institute of Technology, Pune**  
 **PowerPoint File**: [`AI_Defense_Lab_Presentation.pptx`](file:///d:/ecg/AI_Defense_Lab_Presentation.pptx)
 
 ---
@@ -9,7 +9,7 @@
 ### SLIDE 1: The Vision — Protecting People, Payments & Networks
 * **Visual**: Clean dark defense aesthetic with three highlighted cards representing the 3 Layers of defense.
 * **Spoken Pitch (30 Seconds)**:
-  > *"Respected panel members and judges, good morning. We are Team AITIANS from the Army Institute of Technology, Pune.  
+  > *"Respected panel members and judges, good morning. We are Team IRON from the Army Institute of Technology, Pune.  
   > Today, we present **AI DEFENSE LAB**, built on one undeniable truth: **Modern financial fraud doesn't hack computers—it hacks human psychology.**  
   > We have built a 3-Layer Safety Net that unites Behavioral Biometrics, sub-millisecond machine learning, and Graph Neural Networks into an active adversarial learning loop."*
 
@@ -103,9 +103,9 @@
 ---
 
 ### SLIDE 12: The Vision — A Self-Healing Financial Perimeter
-* **Visual**: Team AITIANS credentials, GitHub repository link (`Abhay-s-8/defense`).
+* **Visual**: Team IRON credentials, GitHub repository link (`Abhay-s-8/defense`).
 * **Spoken Pitch (30 Seconds)**:
-  > *"In conclusion, Team AITIANS has built a complete, self-healing payment defense perimeter. By uniting interaction biometrics, high-speed transaction ML, and graph intelligence into one continuous learning loop, we move from reactive fraud detection to active, resilient defense.  
+  > *"In conclusion, Team IRON has built a complete, self-healing payment defense perimeter. By uniting interaction biometrics, high-speed transaction ML, and graph intelligence into one continuous learning loop, we move from reactive fraud detection to active, resilient defense.  
   > **Attack. Detect. Learn. Defend.** Thank you, and we look forward to your questions."*
 
 ---
